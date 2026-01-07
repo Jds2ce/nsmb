@@ -626,7 +626,28 @@ bool StageEntity::checkSquished()
 
 void StageEntity::onStageComplete(PlayerActor *player) {}
 
-bool StageEntity::setGroundPoundCollision(PlayerActor *player) {}
+bool StageEntity::setGroundPoundCollision(PlayerActor *player)
+{
+    i32 tp = this->position.x;
+    i32 tpc = this->centerOffset.x;
+    i32 pp = player->position.x;
+    i32 pps = player->centerOffset.x;
+    u32 dist = (tp + tpc) - (pp + pps);
+
+    if (this->_2c6 & 0x20)
+        return false;
+
+    if (player->_7ac != 4)
+    {
+        this->linked_player = player->linked_player;
+        dist &= 0x80000000;
+        this->_3ee = dist >> 31;
+        this->_3b4 |= 0x4000;
+        return true;
+    }
+
+    return false;
+}
 
 bool StageEntity::isBelowPlayer(i32 posY, ActiveCollider *collider, u8 player_id)
 {
