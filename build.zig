@@ -90,7 +90,7 @@ fn getSourceByDest(destination: []const u8) ![]u8 {
 
 fn compileFile(source_file: []const u8, destination_file: []const u8) !void {
     const i = std.mem.lastIndexOf(u8, destination_file, &[_]u8{'/'}) orelse 0;
-    std.fs.cwd().makeDir(destination_file[0..i]) catch undefined;
+    std.fs.cwd().makePath(destination_file[0..i]) catch undefined;
 
     const command = .{
         "wine",
@@ -150,6 +150,7 @@ const Release = enum {
     A85E,
     A2DP,
     A85P,
+    A85J_1,
     A2DK,
     A2DC,
     Y7QJ,
@@ -157,7 +158,7 @@ const Release = enum {
     // Returns the enum name with .nds appended (e.g. A2DE.nds)
     pub fn fileName(self: Release) []const u8 {
         return switch (self) {
-            inline .A2DE, .A2DJ, .A85J, .A85E, .A2DP, .A85P, .A2DK, .A2DC, .Y7QJ => |en| @tagName(en) ++ ".nds",
+            inline else => |en| @tagName(en) ++ ".nds",
         };
     }
 
