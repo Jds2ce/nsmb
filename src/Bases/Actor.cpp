@@ -358,31 +358,93 @@ Vec3_32 Actor::getCenteredPosition()
     return result;
 }
 
-// TODO: Are the below a part of Actor or StageActor?
-// Actor & StageActor may use the same file.
 bool Actor::isOutOfViewVertical(Rect *rect,int player_id)
 {
-  return rect->y  + rect->halfHeight + this->position.y + 0x18000 <
-         -Game::cameraY[player_id] + Game::cameraZoomY[player_id];
+  return 
+    rect->halfHeight + rect->y + this->position.y + 0x18000 <
+    -Game::cameraY[player_id] + Game::cameraZoomY[player_id];
 }
 
+i32(*data_ov000_020ca858)(i32, i32, i32, i32);
+i32(*data_ov000_020c6c14[3])(i32, i32, i32, i32) = {
+    Actor::calcDistanceToPlayerNoWrap,
+    Actor::calcDistanceToPlayerWrap,
+    Actor::calcDistanceToPlayerWrap,
+};
 
-u32 data_ov000_020ca858;
-u32 data_ov000_020c6c14[3] = {};
+i32 Actor::calcDistanceToPlayerNoWrap(i32, i32, i32, i32) {
+
+}
+
+i32 Actor::calcDistanceToPlayerWrap(i32, i32, i32, i32) {
+
+}
+
+i32 Actor::getDistanceToPlayer(i32 x, i32 y) {
+    //(*data_ov000_020ca858)()
+}
+
 void Actor::setCalcPositionToPlayerFunction(u32 param_1)
 {
     data_ov000_020ca858 = data_ov000_020c6c14[param_1];
 }
 
-void* data_02039968;
 void Actor::wrapPosition(u32 param_1,u32 param_2,u32 param_3)
-
 {  
-    //(*data_02039968)(param_1,param_3);
+    (*data_02039968)(param_1,param_3);
 }
 
+bool(*data_ov000_020ca854)(i32, i32);
+bool(*data_ov000_020c6c20[3])(i32, i32) = {
+    Actor::isBehindTargetNoWrap,
+    Actor::isBehindTargetWrap,
+    Actor::isBehindTargetWrap,
+};
+
+void Actor::setWrapPositionFunction() {
+    func_020067dc();
+}
+
+
+bool Actor::isBehindTarget(Actor* other) {
+    return (*data_ov000_020ca854)(
+        this->position.x + this->centerOffset.x,
+        other->position.x + other->centerOffset.x
+    );
+}
+
+bool Actor::isInFrontOfTarget(Actor* other) {
+    return (*data_ov000_020ca854)(
+        other->position.x + other->centerOffset.x,
+        this->position.x + this->centerOffset.x
+    );
+}
+
+//bool Actor::
 
 bool Actor::isBehindTargetNoWrap(i32 param_1,i32 param_2)
 {
   return param_1 < param_2;
 }
+
+bool Actor::isBehindTargetWrap(i32 this_, i32 other) {
+    i32 iVar1 = (this_ & data_02085aa4) - (other & data_02085aa4);
+    i32 iVar2 = (data_02085aa4 + 1) / 2;
+    if (iVar1 < 0) {
+        return -iVar1 >= iVar2;
+    } else {
+        return iVar1 > iVar2;
+    }
+}
+
+void Actor::setIsBehindTargetFunction(u32 a) {
+    data_ov000_020ca854 = data_ov000_020c6c20[a];
+}
+
+void Actor::initWrapFunctions(u32 a) {
+    Actor::setWrapPositionFunction();
+    Actor::setCalcPositionToPlayerFunction(a);
+    Actor::setIsBehindTargetFunction(a);
+}
+
+//bool ()
